@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"geek/errors/dao"
 	"geek/errors/service"
-	"log"
 )
 
 func main() {

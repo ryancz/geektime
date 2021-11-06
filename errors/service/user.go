@@ -18,7 +18,7 @@ func CreateUser(account, email string) (*dao.User, error) {
 	if err == nil {
 		return nil, errors.New("CreateUser failed: account exist")
 	}
-	if errors.Cause(err) != gorm.ErrRecordNotFound {
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, errors.WithMessage(err, "CreateUser failed")
 	}
 
