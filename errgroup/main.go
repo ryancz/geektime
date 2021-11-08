@@ -30,9 +30,9 @@ func runSignal(ctx context.Context) error {
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	select {
 	case <-sig:
-		return errors.New("received int signal")
+		return errors.New("received interrupt signal")
 	case <-ctx.Done():
-		return nil
+		return ctx.Err()
 	}
 }
 
@@ -41,7 +41,7 @@ func runServer(ctx context.Context) error {
 		writer.Write([]byte("hello errgroup"))
 	})
 	s := http.Server{
-		Addr:    ":8080",
+		Addr:    ":80808",
 		Handler: http.DefaultServeMux,
 	}
 
