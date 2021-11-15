@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "internal/conf;conf";
+
+message Bootstrap {
+    Server server = 1;
+    Data data = 2;
+}
+
+message Server {
+    message Grpc {
+        string addr = 1;
+        int32 timeout = 2;
+    }
+    Grpc grpc = 1;
+}
+
+message Data {
+    message Db {
+        string driver = 1;
+        string source = 2;
+    }
+    Db db = 1;
+}

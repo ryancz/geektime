@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package user.service.v1;
+package user.v1;
 
-option go_package = "api/user/service/v1;v1";
+option go_package = "api/user/v1;v1";
 
-service User {
+service UserService {
     rpc GetUser (GetUserReq) returns (GetUserReply) {
 
     }
