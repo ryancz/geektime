@@ -41,7 +41,7 @@ func runServer(ctx context.Context) error {
 		writer.Write([]byte("hello errgroup"))
 	})
 	s := http.Server{
-		Addr:    ":80808",
+		Addr:    ":8080",
 		Handler: http.DefaultServeMux,
 	}
 
