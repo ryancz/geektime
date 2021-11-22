@@ -2,19 +2,18 @@ package main
 
 import (
 	"log"
-	"sync"
+	"sync/atomic"
 )
 
 const (
-	evtSuccess = 1
-	evtError = 2
-	evtTimeout = 3
-	evtCount = evtTimeout
+	EvtSuccess = 1
+	EvtError   = 2
+	EvtTimeout = 3
+	EvtCount   = EvtTimeout
 )
 
 type Bucket struct {
-	mut sync.RWMutex
-	counts [evtCount+1]int
+	counts [EvtCount +1]int32
 }
 
 func NewBucket() *Bucket {
@@ -22,47 +21,32 @@ func NewBucket() *Bucket {
 }
 
 func (b *Bucket) Incr(evt int) {
-	b.mut.Lock()
-	defer b.mut.Unlock()
-
-	if evt > 0 && evt <= evtCount {
-		b.counts[evt]++
+	if evt > 0 && evt <= EvtCount {
+		atomic.AddInt32(&b.counts[evt], 1)
 	} else {
 		log.Printf("invalid event %d\n", evt)
 	}
 }
 
-func (b *Bucket) SuccessCount() int {
-	b.mut.RLock()
-	defer b.mut.RUnlock()
-
-	return b.counts[evtSuccess]
+func (b *Bucket) SuccessCount() int32 {
+	return atomic.LoadInt32(&b.counts[EvtSuccess])
 }
 
-func (b *Bucket) ErrorCount() int {
-	b.mut.RLock()
-	defer b.mut.RUnlock()
-
-	return b.counts[evtError]
+func (b *Bucket) ErrorCount() int32 {
+	return atomic.LoadInt32(&b.counts[EvtError])
 }
 
-func (b *Bucket) TimeoutCount() int {
-	b.mut.RLock()
-	defer b.mut.RUnlock()
-
-	return b.counts[evtTimeout]
+func (b *Bucket) TimeoutCount() int32 {
+	return atomic.LoadInt32(&b.counts[EvtTimeout])
 }
 
 func (b *Bucket) SuccessRate() float64 {
-	b.mut.RLock()
-	defer b.mut.RUnlock()
-
-	var totalCount int
-	for _, count := range b.counts {
-		totalCount += count
+	var totalCount int32
+	for i := 1; i <=EvtCount; i++ {
+		totalCount += atomic.LoadInt32(&b.counts[i])
 	}
 	if totalCount == 0 {
 		return 0
 	}
-	return float64(b.counts[evtSuccess])/float64(totalCount)
+	return float64(atomic.LoadInt32(&b.counts[EvtSuccess]))/float64(totalCount)
 }
